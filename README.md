@@ -1,0 +1,10 @@
+
+OrganizationService:getAllOrganizations-add-update-delete-convertOrganizationToDTo-updateRequest-deleteRequest-report-getReportsSentByOrganization-
+ReportService:createReport-convertReportToDTo
+EventService:delete-addArtifactToEvent-updateArtifactAvailability-convertEventToDTO
+FeedbackService: createFeedback-updateFeedback-findFeedbackByOrganizationId-convertFeedBackToODTo-
+RequestService: requestBorrowArtifact- 
+ResearcherService: getRecommendation -report -getReportsSentByResearcher
+ContributorService:report-getReportsSentByContributor
+CertificateService: getAll-addCertificate-updateCertificate-deleteExpiredCertificate-convertCertificateToDTo
+AdminService:getBanList
