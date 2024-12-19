@@ -1,0 +1,130 @@
+package com.example.capstone3.Service;
+
+import com.example.capstone3.Model.Feedback;
+import com.example.capstone3.Repository.FeedbackRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+
+import com.example.capstone3.Api.ApiException;
+import com.example.capstone3.DTO.FeedbackDTO;
+import com.example.capstone3.DTO.FeedbackODTO;
+import com.example.capstone3.Model.*;
+import com.example.capstone3.Repository.*;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+@Service
+@RequiredArgsConstructor
+public class FeedbackService {
+    private final FeedbackRepository feedbackRepository;
+    private final RequestRepository requestRepository;
+    private final OrganizationRepository organizationRepository;
+    private final ContributorRepository contributorRepository;
+    private final ResearcherRepository researcherRepository;
+
+
+
+    public List<FeedbackODTO> getAll()  {
+        return convertFeedBackToODTo(feedbackRepository.findAll());
+    }
+//Bayan
+    public void createFeedback(Integer requestId,FeedbackDTO feedbackDTO) {
+        Request request = requestRepository.findRequestById(requestId);
+        if (request == null) {
+            throw new ApiException("Request not found");
+        }
+        if (!request.getDecision().equalsIgnoreCase("accepted") &&
+                !request.getDecision().equalsIgnoreCase("rejected")) {
+            throw new ApiException("Feedback can only be created for completed requests.");
+        }
+        Feedback feedback = new Feedback();
+
+        feedback.setComment(feedbackDTO.getComment());
+        feedback.setRating(feedbackDTO.getRating());
+        feedback.setCreatedAt(LocalDate.now());
+        feedback.setSenderEmail(feedbackDTO.getSenderEmail());
+        feedback.setReceiverEmail(feedbackDTO.getReceiverEmail());
+
+
+        switch (feedbackDTO.getCreatorType().toLowerCase()) {
+            case "organization":
+                Organization organization = organizationRepository.findOrganizationById(feedbackDTO.getCreatorId());
+                if (organization == null) {
+                    throw new ApiException("Organization not found");
+                }
+                feedback.setOrganization(organization);
+                break;
+            case "contributor":
+                Contributor contributor = contributorRepository.findContributorById(feedbackDTO.getCreatorId());
+                if (contributor == null) {
+                    throw new ApiException("contributor not found");
+                }
+                feedback.setContributor(contributor);
+                break;
+            case "researcher":
+                Researcher researcher = researcherRepository.findResearcherById(feedbackDTO.getCreatorId());
+                if (researcher == null) {
+                    throw new ApiException("researcher not found");
+                }
+                feedback.setResearcher(researcher);
+                break;
+            default:
+                throw new ApiException("Invalid creator type: " + feedbackDTO.getCreatorType());
+        }
+         feedbackRepository.save(feedback);
+    }
+
+//Bayan
+public void updateFeedback(String senderEmail, Integer id, FeedbackDTO feedbackDTO) {
+
+        Feedback feedback = feedbackRepository.findFeedbackById(id);
+        if (feedback==null){
+            throw new ApiException("feedback not found");
+        }
+    if (!feedback.getSenderEmail().equals(senderEmail)) {
+        throw new ApiException("Sender email mismatch");
+        }
+
+        feedback.setComment(feedbackDTO.getComment());
+        feedback.setRating(feedbackDTO.getRating());
+        feedbackRepository.save(feedback);
+    }
+//Bayan
+    public List<FeedbackODTO> findFeedbackByOrganizationId (Integer organization_id){
+        List<Feedback> feedbackByOrganizationId= feedbackRepository.findFeedbackByOrganizationId(organization_id);
+        return convertFeedBackToODTo(feedbackByOrganizationId);
+    }
+//Bayan
+    public List<FeedbackODTO> convertFeedBackToODTo (Collection<Feedback> feedbacks){
+        List<FeedbackODTO> feedbackODTOS= new ArrayList<>();
+        for (Feedback f : feedbacks) {
+            String creatorType = "";
+            String creatorName = "";
+            if (f.getOrganization() != null) {
+                creatorType = "Organization";
+                creatorName = f.getOrganization().getName();
+            } else if (f.getContributor() != null) {
+                creatorType = "Contributor";
+                creatorName = f.getContributor().getName();
+            } else if (f.getResearcher() != null) {
+                creatorType = "Researcher";
+                creatorName = f.getResearcher().getName();
+            }
+            feedbackODTOS.add(new FeedbackODTO(
+                    f.getComment(),
+                    f.getRating(),
+                    creatorType,
+                    creatorName
+            ));
+        }
+
+        return feedbackODTOS;
+    }
+
+}
+
