@@ -92,6 +92,10 @@ ResearcherService:
 
 3/getReportsSentByResearcher
 
+Controller :
+
+"I have implemented all the functionalities in the service layer and created corresponding endpoints for each of them in the controller layer to ensure full integration and accessibility of the features."
+
 Extra Endpoints:
 
 1/ Organization > report
