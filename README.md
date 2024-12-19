@@ -9,7 +9,9 @@ Feedback
 Report
 
 BanList
+
 DTO:
+
 EventDTO- FeedbackDTO-FeedbackODTO- OrganizationIDTO-
 
 OrganizationODTO – ReportODTO –ReportIDTO 
