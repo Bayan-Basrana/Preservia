@@ -36,14 +36,14 @@ public class ReportService {
           if (organization==null){
                throw new ApiException("not found");
                 }
-                organization.getReports().add(report);
+          report.setOrganization(organization);
               organizationRepository.save(organization);}
         if (reportIDTO.getOffenderType().equalsIgnoreCase("researcher")){
             Researcher researcher= researcherRepository.findResearcherById(offender)  ;
             if (researcher==null){
                 throw new ApiException("not found");
             }
-            researcher.getReports().add(report);
+            report.setResearcher(researcher);
             researcherRepository.save(researcher);}
 
         if (reportIDTO.getOffenderType().equalsIgnoreCase("contributor")){
@@ -51,7 +51,7 @@ public class ReportService {
             if (contributor==null){
                 throw new ApiException("not found");
             }
-            contributor.getReports().add(report);
+report.setContributor(contributor);
             contributorRepository.save(contributor);}
         report.setSender(sender);
         report.setReason(reportIDTO.getReason());
